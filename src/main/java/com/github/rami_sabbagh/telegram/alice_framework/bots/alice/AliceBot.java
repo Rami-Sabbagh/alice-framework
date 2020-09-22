@@ -108,7 +108,7 @@ public abstract class AliceBot extends TelegramLongPollingBot {
     /**
      * The updates pipe of the bot.
      */
-    public final Pipe<Update> updatePipe;
+    public final Pipe<Update> updatesPipe;
 
     /**
      * The commands authorizer of the bot.
@@ -150,15 +150,15 @@ public abstract class AliceBot extends TelegramLongPollingBot {
         executor = this.exe;
         silent = new SilentExecutor(this);
 
-        updatePipe = new ConsumeOncePipe<>();
+        updatesPipe = new ConsumeOncePipe<>();
         authorizer = new AuthorizeWithMongoDB(silent, botCreatorID, adminsCollection);
         chatsTracker = new ChatsTracker(botUsername, chatsCollection);
         commandsHandler = new CommandsHandler(botUsername, silent, authorizer);
         interactivityHandler = new RedisInteractivityHandler(redisNamespace, redisCommands);
 
-        updatePipe.registerHandler(chatsTracker);
-        updatePipe.registerHandler(commandsHandler);
-        updatePipe.registerHandler(interactivityHandler);
+        updatesPipe.registerHandler(chatsTracker);
+        updatesPipe.registerHandler(commandsHandler);
+        updatesPipe.registerHandler(interactivityHandler);
 
         if (options.enableDefaultCommand(PROMOTE))
             commandsHandler.registerCommand(new PromoteCommand(adminsCollection, silent, botCreatorID));
@@ -212,7 +212,7 @@ public abstract class AliceBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        updatePipe.process(update);
+        updatesPipe.process(update);
     }
 
     @Override
