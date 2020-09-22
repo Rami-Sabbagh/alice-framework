@@ -112,6 +112,16 @@ public abstract class AliceOptions {
         /**
          * A command for demoting existing admins.
          */
-        DEMOTE
+        DEMOTE,
+
+        /**
+         * The classic ping pong command.
+         */
+        PING,
+
+        /**
+         * A command for updating the commands definition of the bot.
+         */
+        UPDATE_COMMANDS
     }
 }

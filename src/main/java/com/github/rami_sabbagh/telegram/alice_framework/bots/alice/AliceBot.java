@@ -1,6 +1,9 @@
 package com.github.rami_sabbagh.telegram.alice_framework.bots.alice;
 
+import com.github.rami_sabbagh.telegram.alice_framework.commands.Command;
 import com.github.rami_sabbagh.telegram.alice_framework.commands.CommandsHandler;
+import com.github.rami_sabbagh.telegram.alice_framework.commands.Locality;
+import com.github.rami_sabbagh.telegram.alice_framework.commands.Privacy;
 import com.github.rami_sabbagh.telegram.alice_framework.commands.authorizers.StandardAuthorizer;
 import com.github.rami_sabbagh.telegram.alice_framework.interactivity.InteractivityHandler;
 import com.github.rami_sabbagh.telegram.alice_framework.mongodb.ChatsTracker;
@@ -21,8 +24,12 @@ import io.lettuce.core.api.sync.RedisCommands;
 import org.bson.Document;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 import static com.github.rami_sabbagh.telegram.alice_framework.bots.alice.AliceOptions.Collection.ADMINS;
@@ -68,7 +75,7 @@ public abstract class AliceBot extends TelegramLongPollingBot {
 
     /**
      * The Redis namespace of the bot.
-     *
+     * <p>
      * It's a string which prefixes all the fields which the bot uses in the database.
      */
     public final String redisNamespace;
@@ -157,6 +164,44 @@ public abstract class AliceBot extends TelegramLongPollingBot {
             commandsHandler.registerCommand(new PromoteCommand(adminsCollection, silent, botCreatorID));
         if (options.enableDefaultCommand(DEMOTE))
             commandsHandler.registerCommand(new DemoteCommand(adminsCollection, silent, botCreatorID));
+
+        if (options.enableDefaultCommand(PING)) {
+            commandsHandler.newCommand()
+                    .name("ping")
+                    .description("Pong 🏓")
+                    .action((message, parsedCommand) -> silent.compose().text("Pong 🏓")
+                            .chatId(message).send())
+                    .build();
+        }
+
+        if (options.enableDefaultCommand(UPDATE_COMMANDS)) {
+            commandsHandler.newCommand()
+                    .name("update_commands")
+                    .privacy(Privacy.ADMIN)
+                    .action((message, parsedCommand) -> {
+                        Command[] commands = commandsHandler.getCommands();
+                        List<BotCommand> botCommands = new ArrayList<>();
+
+                        for (Command command : commands) {
+                            if (command.locality == Locality.ALL) {
+                                if (command.privacy == Privacy.PUBLIC || command.privacy == Privacy.GROUP_ADMIN) {
+                                    if (command.description != null) {
+                                        botCommands.add(new BotCommand()
+                                                .setCommand(command.name)
+                                                .setDescription(command.description));
+                                    }
+                                }
+                            }
+                        }
+
+                        boolean success = silent.execute(new SetMyCommands().setCommands(botCommands));
+                        silent.compose().text(success ? "Updated commands definition successfully ✅" : "Failed to update commands definition ⚠")
+                                .replyToOnlyInGroup(message).send();
+                    })
+                    .build();
+
+
+        }
     }
 
     private static DefaultBotOptions getDefaultBotOptions(AliceOptions options) {
