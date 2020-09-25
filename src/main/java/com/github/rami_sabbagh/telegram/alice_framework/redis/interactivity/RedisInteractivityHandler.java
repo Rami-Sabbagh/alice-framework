@@ -24,7 +24,10 @@ public class RedisInteractivityHandler extends InteractivityHandler {
 
     @Override
     protected void setActiveListenerId(long chatId, String listenerId) {
-        commands.set(keyPrefix + chatId + "listenerId", listenerId);
+        if (listenerId == null)
+            commands.del(keyPrefix + chatId + ":listenerId");
+        else
+            commands.set(keyPrefix + chatId + ":listenerId", listenerId);
     }
 
     @Override
