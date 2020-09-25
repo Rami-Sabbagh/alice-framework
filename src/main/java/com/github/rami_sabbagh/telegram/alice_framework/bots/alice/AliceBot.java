@@ -165,16 +165,22 @@ public abstract class AliceBot extends TelegramLongPollingBot {
         if (options.enableDefaultCommand(DEMOTE))
             commandsHandler.registerCommand(new DemoteCommand(adminsCollection, silent, botCreatorID));
 
-        if (options.enableDefaultCommand(PING)) {
+        if (options.enableDefaultCommand(CANCEL))
+            commandsHandler.newCommand()
+                    .name("cancel")
+                    .description("Cancel the current operation 🛑")
+                    .action((message, parsedCommand) -> interactivityHandler.deactivateListener(message.getChatId()))
+                    .build();
+
+        if (options.enableDefaultCommand(PING))
             commandsHandler.newCommand()
                     .name("ping")
                     .description("Pong 🏓")
                     .action((message, parsedCommand) -> silent.compose().text("Pong 🏓")
                             .chatId(message).send())
                     .build();
-        }
 
-        if (options.enableDefaultCommand(UPDATE_COMMANDS)) {
+        if (options.enableDefaultCommand(UPDATE_COMMANDS))
             commandsHandler.newCommand()
                     .name("update_commands")
                     .privacy(Privacy.ADMIN)
@@ -199,9 +205,6 @@ public abstract class AliceBot extends TelegramLongPollingBot {
                                 .replyToOnlyInGroup(message).send();
                     })
                     .build();
-
-
-        }
     }
 
     private static DefaultBotOptions getDefaultBotOptions(AliceOptions options) {

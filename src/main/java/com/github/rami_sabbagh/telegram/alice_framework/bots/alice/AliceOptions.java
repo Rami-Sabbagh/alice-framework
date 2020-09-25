@@ -115,6 +115,11 @@ public abstract class AliceOptions {
         DEMOTE,
 
         /**
+         * A command for cancelling the current interactivity.
+         */
+        CANCEL,
+
+        /**
          * The classic ping pong command.
          */
         PING,
