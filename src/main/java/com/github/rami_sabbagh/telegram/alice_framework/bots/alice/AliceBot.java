@@ -22,6 +22,8 @@ import io.lettuce.core.RedisClient;
 import io.lettuce.core.api.StatefulRedisConnection;
 import io.lettuce.core.api.sync.RedisCommands;
 import org.bson.Document;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
@@ -37,6 +39,8 @@ import static com.github.rami_sabbagh.telegram.alice_framework.bots.alice.AliceO
 import static com.github.rami_sabbagh.telegram.alice_framework.bots.alice.AliceOptions.Command.*;
 
 public abstract class AliceBot extends TelegramLongPollingBot {
+
+    private static final Logger logger = LoggerFactory.getLogger(AliceBot.class);
 
     /**
      * The authorization token of the bot.
@@ -201,6 +205,8 @@ public abstract class AliceBot extends TelegramLongPollingBot {
                         }
 
                         boolean success = silent.execute(new SetMyCommands().setCommands(botCommands));
+                        if (success) logger.info("Updated bot commands definition");
+                        else logger.error("Failed to update bot commands definition");
                         silent.compose().text(success ? "Updated commands definition successfully ✅" : "Failed to update commands definition ⚠")
                                 .replyToOnlyInGroup(message).send();
                     })
@@ -215,11 +221,13 @@ public abstract class AliceBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        updatesPipe.process(update);
+        boolean consumed = updatesPipe.process(update);
+        logger.trace(consumed ? "Consumed {}" : "Ignored {}", update);
     }
 
     @Override
     public void onClosing() {
+        logger.info("Bot @{} shutting down...", getBotUsername());
         //Telegram API (Shutdown the async executor)
         super.onClosing();
         //MongoDB
