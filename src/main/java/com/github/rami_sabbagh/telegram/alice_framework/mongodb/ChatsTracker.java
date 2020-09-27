@@ -30,13 +30,23 @@ public class ChatsTracker implements Handler<Update> {
         else return "unknown";
     }
 
+    protected String getChatDisplayName(Chat chat) {
+        if (chat.getTitle() != null) return chat.getTitle();
+        String name = chat.getFirstName();
+        if (chat.getLastName() != null) name += " " + chat.getLastName();
+        if (chat.getUserName() != null) name += " (@" + chat.getUserName() + ")";
+        return name;
+    }
+
     protected boolean isNewChat(Chat chat) {
         return chats.find(eq("_id", chat.getId())).first() == null;
     }
 
     protected void recordChat(Chat chat) {
         if (!isNewChat(chat)) return;
+        String name = getChatDisplayName(chat);
         chats.insertOne(new Document("_id", chat.getId())
+                .append("name", name)
                 .append("type", getChatType(chat))
                 .append("discoveredAt", (int) (System.currentTimeMillis() / 1000L)));
     }
