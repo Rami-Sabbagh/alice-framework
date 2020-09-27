@@ -1,5 +1,7 @@
 package com.github.rami_sabbagh.telegram.alice_framework.utilities;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.groupadministration.SetChatPhoto;
 import org.telegram.telegrambots.meta.api.methods.send.*;
@@ -27,8 +29,9 @@ import java.util.List;
  *     <li><b>On failure:</b> a stacktrace is printed into {@code stderr}, and null is returned.</li>
  * </ul>
  */
-@SuppressWarnings("unused")
 public class SilentExecutor {
+
+    private static final Logger logger = LoggerFactory.getLogger(SilentExecutor.class);
 
     public final AbsSender bot;
 
@@ -50,7 +53,7 @@ public class SilentExecutor {
             bot.executeAsync(method, callback);
             return true;
         } catch (TelegramApiException e) {
-            e.printStackTrace();
+            logger.error("Silent Telegram API exception", e);
             return false;
         }
     }
@@ -59,7 +62,7 @@ public class SilentExecutor {
         try {
             return bot.execute(method);
         } catch (TelegramApiException e) {
-            e.printStackTrace();
+            logger.error("Silent Telegram API exception", e);
             return null;
         }
     }
@@ -68,7 +71,7 @@ public class SilentExecutor {
         try {
             return bot.execute(sendDocument);
         } catch (TelegramApiException e) {
-            e.printStackTrace();
+            logger.error("Silent Telegram API exception", e);
             return null;
         }
     }
@@ -77,7 +80,7 @@ public class SilentExecutor {
         try {
             return bot.execute(sendPhoto);
         } catch (TelegramApiException e) {
-            e.printStackTrace();
+            logger.error("Silent Telegram API exception", e);
             return null;
         }
     }
@@ -86,7 +89,7 @@ public class SilentExecutor {
         try {
             return bot.execute(sendVideo);
         } catch (TelegramApiException e) {
-            e.printStackTrace();
+            logger.error("Silent Telegram API exception", e);
             return null;
         }
     }
@@ -95,7 +98,7 @@ public class SilentExecutor {
         try {
             return bot.execute(sendVideoNote);
         } catch (TelegramApiException e) {
-            e.printStackTrace();
+            logger.error("Silent Telegram API exception", e);
             return null;
         }
     }
@@ -104,7 +107,7 @@ public class SilentExecutor {
         try {
             return bot.execute(sendSticker);
         } catch (TelegramApiException e) {
-            e.printStackTrace();
+            logger.error("Silent Telegram API exception", e);
             return null;
         }
     }
@@ -113,7 +116,7 @@ public class SilentExecutor {
         try {
             return bot.execute(sendAudio);
         } catch (TelegramApiException e) {
-            e.printStackTrace();
+            logger.error("Silent Telegram API exception", e);
             return null;
         }
     }
@@ -122,7 +125,7 @@ public class SilentExecutor {
         try {
             return bot.execute(sendVoice);
         } catch (TelegramApiException e) {
-            e.printStackTrace();
+            logger.error("Silent Telegram API exception", e);
             return null;
         }
     }
@@ -131,7 +134,7 @@ public class SilentExecutor {
         try {
             return bot.execute(sendMediaGroup);
         } catch (TelegramApiException e) {
-            e.printStackTrace();
+            logger.error("Silent Telegram API exception", e);
             return null;
         }
     }
@@ -140,7 +143,7 @@ public class SilentExecutor {
         try {
             return bot.execute(setChatPhoto);
         } catch (TelegramApiException e) {
-            e.printStackTrace();
+            logger.error("Silent Telegram API exception", e);
             return null;
         }
     }
@@ -149,7 +152,7 @@ public class SilentExecutor {
         try {
             return bot.execute(addStickerToSet);
         } catch (TelegramApiException e) {
-            e.printStackTrace();
+            logger.error("Silent Telegram API exception", e);
             return null;
         }
     }
@@ -158,7 +161,7 @@ public class SilentExecutor {
         try {
             return bot.execute(setStickerSetThumb);
         } catch (TelegramApiException e) {
-            e.printStackTrace();
+            logger.error("Silent Telegram API exception", e);
             return null;
         }
     }
@@ -167,7 +170,7 @@ public class SilentExecutor {
         try {
             return bot.execute(createNewStickerSet);
         } catch (TelegramApiException e) {
-            e.printStackTrace();
+            logger.error("Silent Telegram API exception", e);
             return null;
         }
     }
@@ -176,7 +179,7 @@ public class SilentExecutor {
         try {
             return bot.execute(uploadStickerFile);
         } catch (TelegramApiException e) {
-            e.printStackTrace();
+            logger.error("Silent Telegram API exception", e);
             return null;
         }
     }
@@ -185,7 +188,7 @@ public class SilentExecutor {
         try {
             return bot.execute(editMessageMedia);
         } catch (TelegramApiException e) {
-            e.printStackTrace();
+            logger.error("Silent Telegram API exception", e);
             return null;
         }
     }
@@ -194,7 +197,7 @@ public class SilentExecutor {
         try {
             return bot.execute(sendAnimation);
         } catch (TelegramApiException e) {
-            e.printStackTrace();
+            logger.error("Silent Telegram API exception", e);
             return null;
         }
     }
