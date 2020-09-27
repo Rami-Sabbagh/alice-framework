@@ -7,6 +7,8 @@ import com.github.rami_sabbagh.telegram.alice_framework.commands.Privacy;
 import com.github.rami_sabbagh.telegram.alice_framework.utilities.SilentExecutor;
 import com.mongodb.client.MongoCollection;
 import org.bson.Document;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.meta.api.methods.groupadministration.GetChat;
 import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -15,6 +17,8 @@ import org.telegram.telegrambots.meta.api.objects.User;
 import static com.mongodb.client.model.Filters.eq;
 
 public class PromoteCommand extends Command {
+
+    private static final Logger logger = LoggerFactory.getLogger(PromoteCommand.class);
 
     protected final MongoCollection<Document> admins;
     protected final SilentExecutor silent;
@@ -85,6 +89,10 @@ public class PromoteCommand extends Command {
                 .append("promotedBy", message.getFrom().getId())
                 .append("promotedAt", (int) (System.currentTimeMillis() / 1000)))
                 .wasAcknowledged();
+
+        if (success) logger.info("User ({}) got promoted into an admin by ({})", toPromote, message.getFrom().getId());
+        else
+            logger.error("Failed to promote user ({}) into an admin under a request by ({})", toPromote, message.getFrom().getId());
 
         silent.compose().text(success ? "Promoted to an admin successfully ✅" : "An error occurred while promoting ⚠")
                 .replyToOnlyInGroup(message).send();

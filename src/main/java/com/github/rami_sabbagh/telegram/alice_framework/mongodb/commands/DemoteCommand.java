@@ -7,6 +7,8 @@ import com.github.rami_sabbagh.telegram.alice_framework.commands.Privacy;
 import com.github.rami_sabbagh.telegram.alice_framework.utilities.SilentExecutor;
 import com.mongodb.client.MongoCollection;
 import org.bson.Document;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.meta.api.methods.groupadministration.GetChat;
 import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -16,6 +18,8 @@ import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Updates.set;
 
 public class DemoteCommand extends Command {
+
+    private static final Logger logger = LoggerFactory.getLogger(DemoteCommand.class);
 
     protected final MongoCollection<Document> admins;
     protected final SilentExecutor silent;
@@ -122,6 +126,7 @@ public class DemoteCommand extends Command {
 
         boolean success = admins.deleteOne(eq("_id", toDemote)).wasAcknowledged();
         if (!success) {
+            logger.error("Failed to demote user ({}) under a request by ({})", toDemote, message.getFrom().getId());
             silent.compose().text("An error occurred while demoting ⚠")
                     .replyToOnlyInGroup(message).send();
             return;
@@ -131,14 +136,13 @@ public class DemoteCommand extends Command {
                 set("promotedBy", message.getFrom().getId())).wasAcknowledged();
 
         if (!success) {
-            System.err.println("An error occurred while transferring sub-admins from " + toDemote
-                    + " to " + message.getFrom().getId());
-
+            logger.error("Failed to transfer sub-admins from ({}) to ({})", toDemote, message.getFrom().getId());
             silent.compose().text("An error occurred while transferring sub-admins ⚠")
                     .replyToOnlyInGroup(message).send();
             return;
         }
 
+        logger.info("User ({}) got demoted into a normal user by ({})", toDemote, message.getFrom().getId());
         silent.compose().text("Demoted successfully ✅")
                 .replyToOnlyInGroup(message).send();
 
