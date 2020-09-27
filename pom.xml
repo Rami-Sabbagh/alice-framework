@@ -36,6 +36,18 @@
             <artifactId>mongodb-driver-sync</artifactId>
             <version>4.1.0</version>
         </dependency>
+        <!-- Prometheus client -->
+        <dependency>
+            <groupId>io.prometheus</groupId>
+            <artifactId>simpleclient</artifactId>
+            <version>0.9.0</version>
+        </dependency>
+        <!-- Logging framework -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.19</version>
+        </dependency>
         <!-- Unit testing framework -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
