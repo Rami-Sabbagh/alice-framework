@@ -3,6 +3,8 @@ package com.github.rami_sabbagh.telegram.alice_framework.mongodb;
 import com.github.rami_sabbagh.telegram.alice_framework.pipes.Handler;
 import com.mongodb.client.MongoCollection;
 import org.bson.Document;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -13,6 +15,8 @@ import java.util.Objects;
 import static com.mongodb.client.model.Filters.eq;
 
 public class ChatsTracker implements Handler<Update> {
+
+    private static final Logger logger = LoggerFactory.getLogger(ChatsTracker.class);
 
     protected final String botUsername;
     protected final MongoCollection<Document> chats;
@@ -49,6 +53,8 @@ public class ChatsTracker implements Handler<Update> {
                 .append("name", name)
                 .append("type", getChatType(chat))
                 .append("discoveredAt", (int) (System.currentTimeMillis() / 1000L)));
+
+        logger.info("Discovered new chat \"{}\" ({}) [{}]", name, chat.getId(), getChatType(chat));
     }
 
     protected void migrateChat(Message message) {
@@ -63,6 +69,9 @@ public class ChatsTracker implements Handler<Update> {
 
         chats.insertOne(document);
         chats.deleteOne(eq("_id", message.getMigrateFromChatId()));
+
+        logger.info("Migrated chat from [group: {}] to [supergroup: {}]",
+                message.getMigrateFromChatId(), message.getMigrateToChatId());
     }
 
     protected void removeChat(Chat chat) {
